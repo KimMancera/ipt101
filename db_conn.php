@@ -1,6 +1,6 @@
 <?php
 //Database connection parameters
-$sname = "localhost:3307"; // Server name and port
+$sname = "localhost"; // Server name and port
 $uname = "root"; // Database username
 $password = ""; // Database password
 $db_name = "ipt101"; // Database name
