@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,50 +16,89 @@
                         <?php echo $_GET['error']; ?>
                     </div>
                 <?php } ?>
-                <form class="shadow-lg p-3 mb-5 bg-white rounded" action="register.php" method="POST">
+                <form class="shadow-lg p-3 mb-5 bg-white rounded" action="register.php" method="POST" id="registerForm">
                     <h2 class="text-center">Register</h2>
                     <div class="mb-3">
                         <label for="Firstname" class="form-label">Firstname:</label>
-                        <input type="text" name="Firstname" class="form-control" placeholder="Firstname" required>
+                        <input type="text" name="Firstname" class="form-control" placeholder="Firstname" id="Firstname" required>
                     </div>
                     <div class="mb-3">
                         <label for="Middlename" class="form-label">Middlename:</label>
-                        <input type="text" name="Middlename" class="form-control" placeholder="Middlename" required>
+                        <input type="text" name="Middlename" class="form-control" placeholder="Middlename" id="Middlename">
                     </div>
                     <div class="mb-3">
                         <label for="Lastname" class="form-label">Lastname:</label>
-                        <input type="text" name="Lastname" class="form-control" placeholder="Lastname" required>
+                        <input type="text" name="Lastname" class="form-control" placeholder="Lastname" id="Lastname" required>
                     </div>
                     <div class="mb-3">
                         <label for="username" class="form-label">Username:</label>
-                        <input type="text" name="username" class="form-control" placeholder="Username" required>
+                        <input type="text" name="username" class="form-control" placeholder="Username" id="username" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email:</label>
-                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                        <input type="email" name="email" class="form-control" placeholder="Email" id="email" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password:</label>
-                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <input type="password" name="password" class="form-control" placeholder="Password" id="password" required>
                     </div>
                     <div class="mb-3">
                         <label for="confirm_password" class="form-label">Confirm Password:</label>
-                        <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password" required>
+                        <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password" id="confirm_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status:</label>
+                        <select name="status" class="form-select" id="status" required>
+                            <option value="">Select Status</option>
+                            <option value="Single">Single</option>
+                            <option value="In a Relationship">In a Relationship</option>
+                            <option value="Married">Married</option>
+                            <option value="Divorced">Divorced</option>
+                        </select>
                     </div>
                     <button type="submit" name="register_btn" class="btn btn-primary">Register</button>
                     <div class="row">
                         <div class="col-md-6 offset-md-3">
                             <div class="text-center">
                                 <a href="loginform.php">Click to login</a>
+                            </div>
+                        </div>
                     </div>
-            </div>
-        </div>
-                </div>
                 </form>
             </div>
         </div>
-        
-        </div>
     </div>
+
+    <script>
+        // Retrieve values from local storage and set them as input values
+        document.addEventListener("DOMContentLoaded", function() {
+            var storedFirstname = localStorage.getItem("Firstname");
+            var storedMiddlename = localStorage.getItem("Middlename");
+            var storedLastname = localStorage.getItem("Lastname");
+            var storedUsername = localStorage.getItem("username");
+            var storedEmail = localStorage.getItem("email");
+
+            if (storedFirstname) document.getElementById("Firstname").value = storedFirstname;
+            if (storedMiddlename) document.getElementById("Middlename").value = storedMiddlename;
+            if (storedLastname) document.getElementById("Lastname").value = storedLastname;
+            if (storedUsername) document.getElementById("username").value = storedUsername;
+            if (storedEmail) document.getElementById("email").value = storedEmail;
+        });
+
+        // Store input values in local storage when the form is submitted
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+            var firstname = document.getElementById("Firstname").value;
+            var middlename = document.getElementById("Middlename").value;
+            var lastname = document.getElementById("Lastname").value;
+            var username = document.getElementById("username").value;
+            var email = document.getElementById("email").value;
+
+            localStorage.setItem("Firstname", firstname);
+            localStorage.setItem("Middlename", middlename);
+            localStorage.setItem("Lastname", lastname);
+            localStorage.setItem("username", username);
+            localStorage.setItem("email", email);
+        });
+    </script>
 </body>
 </html>
