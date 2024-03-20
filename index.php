@@ -1,8 +1,8 @@
 <?php
-//Start session to manage user session data
+// Start session to manage user session data
 session_start();
 
-//To connect with the database connection file
+// Include database connection file
 include "db_conn.php";
 
 // Check if form fields are set and not empty
@@ -57,10 +57,16 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
             // Check if username and password match
             if ($row['username'] === $username && password_verify($password, $row['password'])) {
-                echo "Logged in!";
                 // Set session variables for user
                 $_SESSION['user_id'] = $row['id'];
                 $_SESSION['username'] = $username;
+
+                // Update Active status to 'online'
+                $update_sql = "UPDATE users SET Active = 'Online' WHERE id = ?";
+                $update_stmt = mysqli_prepare($conn, $update_sql);
+                mysqli_stmt_bind_param($update_stmt, "i", $row['id']);
+                mysqli_stmt_execute($update_stmt);
+
                 // Redirect user to home page
                 header("Location: home.php");
                 exit();
