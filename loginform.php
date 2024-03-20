@@ -1,48 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOGIN</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .container {
-            max-width: 500px;
-            margin-top: 100px;
-        }
-        .error {
-            color: red;
-        }
-    </style>
+    <link rel="Stylesheet" type="text/css" href="Stylesheets.css"> 
 </head>
+
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6 offset-md-3">
-                
-                <?php if (isset($_GET['error'])) { ?>
-                    <p class="error text-center"><?php echo $_GET['error']; ?></p>
-                <?php } ?>
-                <form  class="shadow-lg p-3 mb-5 bg-white rounded" action="index.php" method="POST">
-					<h2 class="text-center">LOGIN</h2>
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username:</label>
-                        <input type="text" name="username" class="form-control" placeholder="username">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password:</label>
-                        <input type="password" name="password" class="form-control" placeholder="password">
-                    </div>
-                    <button type="submit" class="btn btn-primary">submit</button>
-                </form>
-                <div class="text-center mt-3">
-                    <a href="registrationform.php">Click to register</a>
-                </div>
-            </div>
+    <form id="loginForm" action="index.php" method="POST">
+        <h2 style="color:white">LOGIN</h2>
+        <?php if (isset($_GET['error'])) { ?>
+            <p class="error"><?php echo $_GET['error']; ?></p> <?php } ?>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" placeholder="username">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="password"><br>
+        
+        <button type="submit">submit</button><br><br>
+
+        <div>
+            <a href="registrationform.php">Click to register</a>
         </div>
-    </div>
+    </form>
+
+    <script>
+        // Retrieve username from local storage if exists
+        document.addEventListener("DOMContentLoaded", function() {
+            const username = localStorage.getItem("username");
+            if (username) {
+                document.getElementById("username").value = username;
+            }
+        });
+
+        // Store username in local storage when the form is submitted
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            const username = document.getElementById("username").value;
+            localStorage.setItem("username", username);
+        });
+    </script>
 </body>
 </html>
