@@ -5,42 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOGIN</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="Stylesheet" type="text/css" href="Stylesheets.css"> 
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.2/font/bootstrap-icons.min.css">
+    
 </head>
 
 <body>
-    <form id="loginForm" action="index.php" method="POST">
-        <h2 style="color:white">LOGIN</h2>
-        <?php if (isset($_GET['error'])) { ?>
-            <p class="error"><?php echo $_GET['error']; ?></p> <?php } ?>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form id="loginForm" action="index.php" method="POST" class="bg-light p-4">
+                    <h2 class="mb-4">LOGIN</h2>
+                    <?php if (isset($_GET['error'])) { ?>
+                        <p class="error"><?php echo $_GET['error']; ?></p> <?php } ?>
 
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" placeholder="username">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username:</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Username">
+                    </div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="password"><br>
-        
-        <button type="submit">submit</button><br><br>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <div class="input-group">
+                            <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="submit" class="btn btn-primary">Submit</button><br><br>
 
-        <div>
-            <a href="registrationform.php">Click to register</a>
+                    <div>
+                        <a href="registrationform.php">Click to register</a>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 
     <script>
-        // Retrieve username from local storage if exists
-        document.addEventListener("DOMContentLoaded", function() {
-            const username = localStorage.getItem("username");
-            if (username) {
-                document.getElementById("username").value = username;
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('bi-eye');
+                this.querySelector('i').classList.toggle('bi-eye-slash');
+            });
+
+            // Check if the browser supports local storage
+            if (typeof(Storage) !== "undefined") {
+                // Retrieve values from local storage and set them as input values
+                document.getElementById("username").value = localStorage.getItem("username") || "";
+                document.getElementById("password").value = localStorage.getItem("password") || "";
+
+                // Store input values in local storage when the form is submitted
+                document.getElementById("submit").addEventListener("click", function() {
+                    localStorage.setItem("username", document.getElementById("username").value);
+                    
+
+                    // Mark the form as submitted
+                    document.querySelector("form").submitted = true;
+                });
+
+                // Clear local storage when navigating away from the page without submitting the form
+                window.addEventListener('beforeunload', function(event) {
+                    if (!document.querySelector("form").submitted) {
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("password");
+                    }
+                });
+            } else {
+                // Local storage is not supported
+                alert("Sorry, your browser does not support web storage. Your inputs will not be saved.");
+            }
+
+            // Remove error message from URL parameters if present
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('error')) {
+                url.searchParams.delete('error');
+                window.history.replaceState({}, document.title, url.toString());
             }
         });
-
-        // Store username in local storage when the form is submitted
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            const username = document.getElementById("username").value;
-            localStorage.setItem("username", username);
-        });
+        
     </script>
+    
 </body>
 </html>
