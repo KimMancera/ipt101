@@ -13,6 +13,123 @@ if (!isset($_SESSION['username'])) {
 $full_name = $email = $address = $gender = $contact_info = $date_of_birth = $education = $skills = $social_media = $note = "";
 $profile_picture = "default_profile.jpg"; // Default profile picture
 
+// Retrieve user information from the "users" table
+$username = $_SESSION['username'];
+
+$sql_user = "SELECT user_id, username, password, Lastname, First_name, Middle_name, email FROM user WHERE username = ?";
+$stmt_user = $conn->prepare($sql_user);
+$stmt_user->bind_param('s', $username);
+$stmt_user->execute();
+$result_user = $stmt_user->get_result();
+$user_data = $result_user->fetch_assoc();
+
+if ($user_data) {
+    $user_id = $user_data['user_id'];
+    $current_db_password = $user_data['password'];
+
+    // Retrieve user profile information from the "user_profile" table
+    $sql_profile = "SELECT
+        user.username,
+        user.password,
+        user.Lastname,
+        user.First_name,
+        user.Middle_name,
+        user.Email,
+        user.Status,
+        user.Active,
+        user.verification_code,
+        user.verified,
+        user_profile.full_name,
+        user_profile.email AS profile_email,
+        user_profile.phone_number,
+        user_profile.address,
+        user_profile.date_of_birth,
+        user_profile.gender,
+        user_profile.profile_picture,
+        user_profile.contact_info,
+        user_profile.note,
+        user_profile.education,
+        user_profile.skills,
+        user_profile.social_media
+    FROM user
+    JOIN user_profile ON user.user_id = user_profile.user_id
+    WHERE user.user_id = ?";
+
+    $stmt_profile = $conn->prepare($sql_profile);
+    $stmt_profile->bind_param('i', $user_id);
+    $stmt_profile->execute();
+    $result_profile = $stmt_profile->get_result();
+
+    if ($result_profile && $result_profile->num_rows > 0) {
+        // If profile exists, retrieve the profile information
+        $row_profile = $result_profile->fetch_assoc();
+
+        // Assigning data into variables
+        $full_name = $row_profile['full_name'];
+        $address = $row_profile['address'];
+        $phone = $row_profile['phone_number'];
+        $gender = $row_profile['gender'];
+        $contact_info = $row_profile['contact_info'];
+        $date_of_birth = $row_profile['date_of_birth'];
+        $education = $row_profile['education'];
+        $note = $row_profile['note'];
+        $social_media = $row_profile['social_media'];
+        $skills = $row_profile['skills'];
+        $profile_picture = $row_profile['profile_picture'] ?: $profile_picture;
+
+        // Additional user information
+        $username = $row_profile['username'];
+        $lastname = $row_profile['Lastname'];
+        $first_name = $row_profile['First_name'];
+        $middle_name = $row_profile['Middle_name'];
+        $email = $row_profile['Email'];
+        $status = $row_profile['Status'];
+        $active = $row_profile['Active'];
+        $verification_code = $row_profile['verification_code'];
+        $verified = $row_profile['verified'];
+    } else {
+        // If profile doesn't exist, handle it here
+    }
+} else {
+    // Redirect to login page if user information is not found
+    header("Location: loginform.php");
+    exit();
+}
+
+// Handle form submission for password update
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
+    $current_password = $_POST['current_password'];
+    $new_password = $_POST['new_password'];
+    $confirm_password = $_POST['confirm_password'];
+
+    // Verify current password
+    if ($current_password === $current_db_password) {
+        // Check if new password and confirm password match
+        if ($new_password === $confirm_password) {
+            // Update the password in the database
+            $sql_update_password = "UPDATE user SET password = ? WHERE user_id = ?";
+            $stmt_update_password = $conn->prepare($sql_update_password);
+            $stmt_update_password->bind_param('si', $new_password, $user_id);
+
+            if ($stmt_update_password->execute()) {
+                $message = "Password updated successfully.";
+                $message_type = "success";
+            } else {
+                $message = "Error updating password.";
+                $message_type = "danger";
+            }
+        } else {
+            $message = "New password and confirm password do not match.";
+            $message_type = "danger";
+        }
+    } else {
+        $message = "Current password is incorrect.";
+        $message_type = "danger";
+    }
+}
+
+// Close the database connection
+mysqli_close($conn);
 ?>
 
 
