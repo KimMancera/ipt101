@@ -19,12 +19,12 @@
                 <form class="shadow-lg p-3 mb-5 bg-white rounded" action="register.php" method="POST" id="registerForm">
                     <h2 class="text-center">Register</h2>
                     <div class="mb-3">
-                        <label for="Firstname" class="form-label">Firstname:</label>
-                        <input type="text" name="Firstname" class="form-control" placeholder="Firstname" id="Firstname" required>
+                        <label for="First_name" class="form-label">Firstname:</label>
+                        <input type="text" name="First_name" class="form-control" placeholder="Firstname" id="First_name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="Middlename" class="form-label">Middlename:</label>
-                        <input type="text" name="Middlename" class="form-control" placeholder="Middlename" id="Middlename">
+                        <label for="Middle_name" class="form-label">Middlename:</label>
+                        <input type="text" name="Middle_name" class="form-control" placeholder="Middlename" id="Middle_name">
                     </div>
                     <div class="mb-3">
                         <label for="Lastname" class="form-label">Lastname:</label>
@@ -36,7 +36,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email:</label>
-                        <input type="email" name="email" class="form-control" placeholder="Email" id="email" required>
+                        <input type="email" name="Email" class="form-control" placeholder="Email" id="Email" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password:</label>
@@ -47,8 +47,8 @@
                         <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password" id="confirm_password" required>
                     </div>
                     <div class="mb-3">
-                        <label for="status" class="form-label">Status:</label>
-                        <select name="status" class="form-select" id="status" required>
+                        <label for="Status" class="form-label">Status:</label>
+                        <select name="Status" class="form-select" id="Status" required>
                             <option value="">Select Status</option>
                             <option value="Single">Single</option>
                             <option value="In a Relationship">In a Relationship</option>
@@ -56,7 +56,8 @@
                             <option value="Divorced">Divorced</option>
                         </select>
                     </div>
-                    <button type="submit" name="register_btn" class="btn btn-primary">Register</button>
+                    <button type="submit" name="register_btn" id="register_btn" class="btn btn-primary">Register</button>
+                    
                     <div class="row">
                         <div class="col-md-6 offset-md-3">
                             <div class="text-center">
@@ -70,34 +71,58 @@
     </div>
 
     <script>
-        // Retrieve values from local storage and set them as input values
-        document.addEventListener("DOMContentLoaded", function() {
-            var storedFirstname = localStorage.getItem("Firstname");
-            var storedMiddlename = localStorage.getItem("Middlename");
-            var storedLastname = localStorage.getItem("Lastname");
-            var storedUsername = localStorage.getItem("username");
-            var storedEmail = localStorage.getItem("email");
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if the browser supports local storage
+            if (typeof(Storage) !== "undefined") {
+                // Retrieve values from local storage and set them as input values
+                document.getElementById("First_name").value = localStorage.getItem("First_name") || "";
+                document.getElementById("Middle_name").value = localStorage.getItem("Middle_name") || "";
+                document.getElementById("Lastname").value = localStorage.getItem("Lastname") || "";
+                document.getElementById("username").value = localStorage.getItem("username") || "";
+                document.getElementById("password").value = localStorage.getItem("password") || "";
+                document.getElementById("Email").value = localStorage.getItem("Email") || "";
+                document.getElementById("confirm_password").value = localStorage.getItem("confirm_password") || "";
+                document.getElementById("Status").value = localStorage.getItem("Status") || "";
 
-            if (storedFirstname) document.getElementById("Firstname").value = storedFirstname;
-            if (storedMiddlename) document.getElementById("Middlename").value = storedMiddlename;
-            if (storedLastname) document.getElementById("Lastname").value = storedLastname;
-            if (storedUsername) document.getElementById("username").value = storedUsername;
-            if (storedEmail) document.getElementById("email").value = storedEmail;
-        });
+                // Store input values in local storage when the form is submitted
+                document.getElementById("register_btn").addEventListener("click", function() {
+                    localStorage.setItem("First_name", document.getElementById("First_name").value);
+                    localStorage.setItem("Middle_name", document.getElementById("Middle_name").value);
+                    localStorage.setItem("Lastname", document.getElementById("Lastname").value);
+                    localStorage.setItem("username", document.getElementById("username").value);
+                    localStorage.setItem("password", document.getElementById("password").value);
+                    localStorage.setItem("Email", document.getElementById("Email").value);
+                    localStorage.setItem("confirm_password", document.getElementById("confirm_password").value);
+                    localStorage.setItem("Status", document.getElementById("Status").value);
 
-        // Store input values in local storage when the form is submitted
-        document.getElementById("registerForm").addEventListener("submit", function(event) {
-            var firstname = document.getElementById("Firstname").value;
-            var middlename = document.getElementById("Middlename").value;
-            var lastname = document.getElementById("Lastname").value;
-            var username = document.getElementById("username").value;
-            var email = document.getElementById("email").value;
+                    // Mark the form as submitted
+                    document.querySelector("form").submitted = true;
+                });
 
-            localStorage.setItem("Firstname", firstname);
-            localStorage.setItem("Middlename", middlename);
-            localStorage.setItem("Lastname", lastname);
-            localStorage.setItem("username", username);
-            localStorage.setItem("email", email);
+                // Clear local storage when navigating away from the page without submitting the form
+                window.addEventListener('beforeunload', function(event) {
+                    if (!document.querySelector("form").submitted) {
+                        localStorage.removeItem("First_name");
+                        localStorage.removeItem("Middle_name");
+                        localStorage.removeItem("Lastname");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("password");
+                        localStorage.removeItem("Email");
+                        localStorage.removeItem("confirm_password");
+                        localStorage.removeItem("Status");
+                    }
+                });
+            } else {
+                // Local storage is not supported
+                alert("Sorry, your browser does not support web storage. Your inputs will not be saved.");
+            }
+
+            // Remove error message from URL parameters if present
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('error')) {
+                url.searchParams.delete('error');
+                window.history.replaceState({}, document.title, url.toString());
+            }
         });
     </script>
 </body>
