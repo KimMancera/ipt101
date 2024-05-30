@@ -56,6 +56,13 @@
                             <option value="Divorced">Divorced</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="role">Role:</label>
+                            <select id="role" name="role" required>
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                            </select>
+                    </div>
                     <button type="submit" name="register_btn" id="register_btn" class="btn btn-primary">Register</button>
                     
                     <div class="row">

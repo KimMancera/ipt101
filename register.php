@@ -17,7 +17,6 @@ require 'PHPmailer/src/SMTP.php';
 $mail = new PHPMailer(true);
 
 // Retrieve form data
-$user_id = $_POST['user_id'];
 $firstname = $_POST['First_name'];
 $middlename = $_POST['Middle_name'];
 $lastname = $_POST['Lastname'];
@@ -26,6 +25,7 @@ $email = $_POST['Email'];
 $password = $_POST['password'];
 $confirm_password = $_POST['confirm_password'];
 $status = $_POST['Status'];
+$role = $_POST['role']; // Retrieve user role from form data
 $verification_code = bin2hex(random_bytes(16)); // Generate a random verification code
 
 // Function to validate password format
@@ -50,7 +50,7 @@ function validateEmail($email) {
 }
 
 // Check if required fields are empty
-if (empty($username) || empty($email) || empty($password) || empty($status)) {
+if (empty($username) || empty($email) || empty($password) || empty($status) || empty($role)) {
     // Redirect to registration form with error message if any required field is empty
     header("Location: registrationform.php?error=Please fill in all fields");
     exit();
@@ -83,8 +83,8 @@ if (empty($username) || empty($email) || empty($password) || empty($status)) {
     }
 
     // Insert user data into database
-    $sql = "INSERT INTO user (First_name, Middle_name, Lastname, username, Email, password, verification_code, Status) 
-            VALUES ('$firstname', '$middlename', '$lastname', '$username', '$email', '$password', '$verification_code', '$status')";
+    $sql = "INSERT INTO user (First_name, Middle_name, Lastname, username, Email, password, verification_code, Status, role) 
+            VALUES ('$firstname', '$middlename', '$lastname', '$username', '$email', '$password', '$verification_code', '$status', '$role')";
 
     if (mysqli_query($conn, $sql)) {
         try {

@@ -27,7 +27,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     }
     // To check if the password is empty
     else if (empty($password)){
-        header("Location: loginform.php?error=password is required");
+        header("Location: loginform.php?error=Password is required");
         exit();
     }
     // Proceed with authentication
@@ -64,6 +64,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 $_SESSION['username'] = $row['username'];
                 $_SESSION['name'] = $row['name'];
                 $_SESSION['user_id'] = $row['user_id'];
+                $_SESSION['role'] = $row['role'];
 
                 // Update Active status to 'online'
                 $update_sql = "UPDATE user SET Active = 'Online' WHERE user_id = ?";
@@ -71,8 +72,14 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 mysqli_stmt_bind_param($update_stmt, "i", $row['user_id']);
                 mysqli_stmt_execute($update_stmt);
 
-                // Redirect user to home page/dashboard
-                header("Location: dashboard.php");
+                // Redirect user to appropriate dashboard based on role
+                if ($row['role'] === 'student') {
+                    header("Location: student_dashboard.php");
+                } else if ($row['role'] === 'teacher') {
+                    header("Location: teacher_dashboard.php");
+                } else {
+                    header("Location: dashboard.php");
+                }
                 exit();
             }
             // To send the user if the credentials are incorrect
