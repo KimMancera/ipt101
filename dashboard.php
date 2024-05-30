@@ -1,7 +1,6 @@
 <?php
-session_start();
-// Include your database connection file
-include 'db_conn.php';
+session_start(); // Start the session to track the user's login status
+include 'db_conn.php'; // Include the file that contains the database connection
 
 // Check if the user is not logged in, then redirect to the login page
 if (!isset($_SESSION['username'])) {
@@ -11,17 +10,17 @@ if (!isset($_SESSION['username'])) {
 
 // Initialize variables with default values
 $full_name = $email = $address = $gender = $contact_info = $date_of_birth = $education = $skills = $social_media = $note = "";
-$profile_picture = "default_profile.jpg"; // Default profile picture
+$profile_picture = "AdminLTELogo.png"; // Default profile picture
 
 // Retrieve user information from the "users" table
 $username = $_SESSION['username'];
 
 $sql_user = "SELECT user_id, username, password, Lastname, First_name, Middle_name, email FROM user WHERE username = ?";
-$stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param('s', $username);
-$stmt_user->execute();
-$result_user = $stmt_user->get_result();
-$user_data = $result_user->fetch_assoc();
+$stmt_user = $conn->prepare($sql_user); // Prepare the SQL query
+$stmt_user->bind_param('s', $username); // Bind parameters to the query
+$stmt_user->execute(); // Execute the query
+$result_user = $stmt_user->get_result(); // Get the result of the query
+$user_data = $result_user->fetch_assoc(); // Fetch the user data as an associative array
 
 if ($user_data) {
     $user_id = $user_data['user_id'];
@@ -104,23 +103,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 
     // Verify current password
     if ($current_password === $current_db_password) {
-        // Check if new password and confirm password match
-        if ($new_password === $confirm_password) {
-            // Update the password in the database
-            $sql_update_password = "UPDATE user SET password = ? WHERE user_id = ?";
-            $stmt_update_password = $conn->prepare($sql_update_password);
-            $stmt_update_password->bind_param('si', $new_password, $user_id);
+        // Check if new password is not the same as the current password
+        if ($new_password === $current_db_password) {
+            $message = "New password cannot be the same as the current password.";
+            $message_type = "danger";
+        } else {
+            // Check if new password and confirm password match
+            if ($new_password === $confirm_password) {
+                // Check if new password is not in the password history
+                $sql_check_password_history = "SELECT COUNT(*) as count FROM user_password_history WHERE user_id = ? AND password = ?";
+                $stmt_check_password_history = $conn->prepare($sql_check_password_history);
+                $stmt_check_password_history->bind_param('is', $user_id, $new_password);
+                $stmt_check_password_history->execute();
+                $result_check_password_history = $stmt_check_password_history->get_result();
+                $row_check_password_history = $result_check_password_history->fetch_assoc();
 
-            if ($stmt_update_password->execute()) {
-                $message = "Password updated successfully.";
-                $message_type = "success";
+                if ($row_check_password_history['count'] > 0) {
+                    $message = "You cannot reuse an old password.";
+                    $message_type = "danger";
+                } else {
+                    // Update the password in the user_password_history table
+                    $sql_insert_password_history = "INSERT INTO user_password_history (user_id, password) VALUES (?, ?)";
+                    $stmt_insert_password_history = $conn->prepare($sql_insert_password_history);
+                    $stmt_insert_password_history->bind_param('is', $user_id, $new_password);
+
+                    if ($stmt_insert_password_history->execute()) {
+                        // Password history updated successfully
+                    } else {
+                        // Failed to update password history
+                    }
+
+                    // Update the password in the user table
+                    $sql_update_password = "UPDATE user SET password = ? WHERE user_id = ?";
+                    $stmt_update_password = $conn->prepare($sql_update_password);
+                    $stmt_update_password->bind_param('si', $new_password, $user_id);
+
+                    if ($stmt_update_password->execute()) {
+                        $message = "Password updated successfully.";
+                        $message_type = "success";
+                    } else {
+                        $message = "Error updating password.";
+                        $message_type = "danger";
+                    }
+                }
             } else {
-                $message = "Error updating password.";
+                $message = "New password and confirm password do not match.";
                 $message_type = "danger";
             }
-        } else {
-            $message = "New password and confirm password do not match.";
-            $message_type = "danger";
         }
     } else {
         $message = "Current password is incorrect.";
@@ -128,9 +157,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
     }
 }
 
-// Close the database connection
-mysqli_close($conn);
+mysqli_close($conn); // Close the database connection
 ?>
+
+
+
+
+
 
 
 <!DOCTYPE html>
@@ -138,7 +171,7 @@ mysqli_close($conn);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AdminLTE Interface</title>
+  <title>Dashboard</title>
   <!-- AdminLTE CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
   <!-- Font Awesome Icons -->
@@ -267,7 +300,7 @@ mysqli_close($conn);
                     if (!empty($profile_picture)) {
                       echo '<img class="profile-user-img img-fluid img-circle" src="data:image/jpeg;base64,'.base64_encode($profile_picture) . '" alt="User profile picture">';
                     } else {
-                      echo '<img class="profile-user-img img-fluid img-circle" src="img/avatar.png" alt="Blank profile picture">';
+                      echo '<img class="profile-user-img img-fluid img-circle" src="AdminLTELogo.png" alt="Blank profile picture">';
                     }
                     ?>
                   </div>
@@ -307,7 +340,7 @@ mysqli_close($conn);
                   <hr>
                   <strong><i class="fas fa-globe mr-1"></i> Social Media</strong>
                   <p class="text-muted">
-                    <?php echo "$social_media<br>"; ?>
+                      <?php echo $social_media; ?>
                   </p>
                   <hr>
                   <strong><i class="far fa-file-alt mr-1"></i> Notes</strong>
@@ -337,13 +370,13 @@ mysqli_close($conn);
                         <div class="form-group row">
                           <label for="username" class="col-sm-2 col-form-label">Username</label>
                           <div class="col-sm-10">
-                            <input type="text" class="form-control" id="username" name="username" value="<?php echo $username; ?>" placeholder="Username" required>
+                            <input type="text" class="form-control" id="username" name="username" value="<?php echo $username; ?>" placeholder="Username" readonly="true">
                           </div>
                         </div>
                         <div class="form-group row">
                           <label for="email" class="col-sm-2 col-form-label">Email</label>
-                          <div class="col-sm-10">
-                            <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>" placeholder="Email" required>
+                          <div class="col-sm-10"> 
+                            <input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>" placeholder="Email" readonly="true">
                           </div>
                         </div>
                         <div class="form-group row">
@@ -406,7 +439,7 @@ mysqli_close($conn);
                         </div>
                         <div class="form-group row">
                           <div class="offset-sm-2 col-sm-10">
-                            <button type="submit" name="submit" class="btn btn-danger">Submit</button>
+                            <button type="submit" name="submit" class="btn btn-success">Save Changes</button>
                           </div>
                         </div>
                       </form>
@@ -426,7 +459,7 @@ mysqli_close($conn);
                                     <div class="form-group row">
                                         <label for="current_password" class="col-sm-2 col-form-label">Current Password</label>
                                         <div class="col-sm-10">
-                                            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" required>
+                                            <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Current Password" >
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -443,7 +476,7 @@ mysqli_close($conn);
                                     </div>
                                     <div class="form-group row">
                                         <div class="offset-sm-2 col-sm-10">
-                                            <button type="submit" name="submit" class="btn btn-danger">Submit</button>
+                                            <button type="submit" name="submit" class="btn btn-success">Save Changes</button>
                                         </div>
                                     </div>
                                 </div>
@@ -466,18 +499,38 @@ mysqli_close($conn);
       </div>
     </footer>
   </div>
-  <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Bootstrap 4 -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-  <!-- AdminLTE App -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      $('#profile-btn').on('click', function() {
-        $('.edit-profile-form').toggle();
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Remove 'error' and 'success' parameters from the URL
+        if (window.history.replaceState) {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('error');
+          url.searchParams.delete('success');
+          window.history.replaceState({ path: url.href }, '', url.href);
+        }
+
+        // Automatically hide any error or success messages after 3 seconds
+        const alertMessages = document.querySelectorAll('.alert-danger, .alert-success');
+        if (alertMessages) {
+          alertMessages.forEach(function(message) {
+            setTimeout(() => message.style.display = 'none', 3000);
+          });
+        }
       });
-    });
-  </script>
-</body>
-</html>
+    </script> 
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('#profile-btn').on('click', function() {
+          $('.edit-profile-form').toggle();
+        });
+      });
+    </script>
+
+  </body>
+  </html>

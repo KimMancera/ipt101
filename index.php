@@ -1,14 +1,14 @@
 <?php
-//Start session to manage user session data
+// Start session to manage user session data
 session_start();
 
-//To connect with the database connection file
+// To connect with the database connection file
 include "db_conn.php";
 
-//Check if form fields are set and not empty
+// Check if form fields are set and not empty
 if (isset($_POST['username']) && isset($_POST['password'])) { 
     
-    //Function to filter the input data
+    // Function to filter the input data
     function validate($data) {
         $data = trim($data);
         $data = stripslashes($data);
@@ -17,28 +17,37 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     }
 
     // Validate and filter the username and password inputs
-    $username = validate($_POST['username']);
+    $username = validate($_POST['username']);   
     $password = validate($_POST['password']);
 
-    //To check if the username is empty
+    // To check if the username is empty
     if (empty($username)) {
         header("Location: loginform.php?error=Username is required");
         exit();
     }
-    //To check if the password is empty
+    // To check if the password is empty
     else if (empty($password)){
         header("Location: loginform.php?error=password is required");
         exit();
     }
-    //Proceed with authentication
+    // Proceed with authentication
     else {
-        //To check if username and password match in database
-        $sql = "SELECT * FROM user WHERE username='$username' AND password='$password'";
-        $result = mysqli_query($conn, $sql);
+        // Prepare SQL statement to check if username and password match in database
+        $sql = "SELECT * FROM user WHERE username = ? AND password = ?";
+        $stmt = mysqli_prepare($conn, $sql);
 
-        //To check if there is a matching user record
+        // Bind parameters
+        mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+
+        // Execute statement
+        mysqli_stmt_execute($stmt);
+
+        // Get the result
+        $result = mysqli_stmt_get_result($stmt);
+
+        // To check if there is a matching user record
         if (mysqli_num_rows($result) === 1) {
-            $row = mysqli_fetch_assoc($result); 
+            $row = mysqli_fetch_assoc($result);
 
             // To check if the email is verified
             if ($row['verified'] == 0) {
@@ -47,8 +56,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 exit();
             }
 
-            //To check if username and password match
-            if ($row['username']  === $username && $row['password'] === $password) {
+            // To check if username and password match
+            if ($row['username'] === $username && $row['password'] === $password) {
                 echo "Logged in!";
                 
                 // Set session variables for user
@@ -62,25 +71,24 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                 mysqli_stmt_bind_param($update_stmt, "i", $row['user_id']);
                 mysqli_stmt_execute($update_stmt);
 
-
                 // Redirect user to home page/dashboard
                 header("Location: dashboard.php");
                 exit();
             }
-            //To send the user if the credentials are incorrect
+            // To send the user if the credentials are incorrect
             else {
                 header("Location: loginform.php?error=Incorrect Username or password");
                 exit();
             }
         }
-        //To send the user if the credentials are incorrect
+        // To send the user if the credentials are incorrect
         else {
             header("Location: loginform.php?error=Incorrect Username or password");
             exit();
         }
     }
 }
-//To send the user to login form if the data is not set
+// To send the user to login form if the data is not set
 else {
     header("Location: loginform.php");
     exit();

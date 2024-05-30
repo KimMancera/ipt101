@@ -6,9 +6,7 @@
     <title>LOGIN</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.2/font/bootstrap-icons.min.css">
-    
 </head>
-
 <body>
     <div class="container mt-5">
         <div class="row justify-content-center">
@@ -32,11 +30,21 @@
                             </button>
                         </div>
                     </div>
-                    
+
                     <button type="submit" id="submit" class="btn btn-primary">Submit</button><br><br>
 
-                    <div>
+                    <div class="text-center mb-3">
                         <a href="registrationform.php">Click to register</a>
+                    </div>
+                    
+                    <div class="text-center">
+                        <p>or login with</p>
+                        <a href="google-login.php" class="btn btn-danger">
+                            <i class="bi bi-google"></i> Google
+                        </a>
+                        <a href="facebook-login.php" class="btn btn-primary">
+                            <i class="bi bi-facebook"></i> Facebook
+                        </a>
                     </div>
                 </form>
             </div>
@@ -65,7 +73,6 @@
                 document.getElementById("submit").addEventListener("click", function() {
                     localStorage.setItem("username", document.getElementById("username").value);
                     
-
                     // Mark the form as submitted
                     document.querySelector("form").submitted = true;
                 });
@@ -89,8 +96,6 @@
                 window.history.replaceState({}, document.title, url.toString());
             }
         });
-        
     </script>
-    
 </body>
 </html>
