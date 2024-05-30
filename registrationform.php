@@ -61,6 +61,7 @@
                             <select id="role" name="role" required>
                                 <option value="student">Student</option>
                                 <option value="teacher">Teacher</option>
+                                <option value="admin">Admin</option>
                             </select>
                     </div>
                     <button type="submit" name="register_btn" id="register_btn" class="btn btn-primary">Register</button>

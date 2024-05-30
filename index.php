@@ -77,6 +77,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
                     header("Location: student_dashboard.php");
                 } else if ($row['role'] === 'teacher') {
                     header("Location: teacher_dashboard.php");
+                } else  if ($row['role'] === 'admin') {
+                    header("Location: admin_dashboard.php");
                 } else {
                     header("Location: dashboard.php");
                 }
