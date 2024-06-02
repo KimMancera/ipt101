@@ -91,6 +91,7 @@
                 document.getElementById("Email").value = localStorage.getItem("Email") || "";
                 document.getElementById("confirm_password").value = localStorage.getItem("confirm_password") || "";
                 document.getElementById("Status").value = localStorage.getItem("Status") || "";
+                document.getElementById("role").value = localStorage.getItem("role") || "";
 
                 // Store input values in local storage when the form is submitted
                 document.getElementById("register_btn").addEventListener("click", function() {
@@ -102,6 +103,7 @@
                     localStorage.setItem("Email", document.getElementById("Email").value);
                     localStorage.setItem("confirm_password", document.getElementById("confirm_password").value);
                     localStorage.setItem("Status", document.getElementById("Status").value);
+                    localStorage.setItem("role", document.getElementById("role").value);
 
                     // Mark the form as submitted
                     document.querySelector("form").submitted = true;
@@ -118,6 +120,7 @@
                         localStorage.removeItem("Email");
                         localStorage.removeItem("confirm_password");
                         localStorage.removeItem("Status");
+                        localStorage.removeItem("role");
                     }
                 });
             } else {
